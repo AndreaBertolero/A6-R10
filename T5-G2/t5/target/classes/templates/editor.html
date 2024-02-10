@@ -793,18 +793,15 @@ public class TestClasse {
               dataType: "json",
               success: function(response) {
                 console.log(response);
+                
 
                 risp = response;
 
-                perc_robot = response.robotScore.toString();
-              
-                consoleArea.setValue(response.outCompile);
-                highlightCodeCoverage($.parseXML(response.coverage));
                 /*consoleArea2.setValue(`Esito Risultati (percentuale di linee coperte)
-  Il tuo punteggio: ${response.score.toString()}% LOC
-  Il punteggio del robot: ${response.robotScore.toString()}% LOC`);*/
+                Il tuo punteggio: ${response.score.toString()}% LOC
+                Il punteggio del robot: ${response.robotScore.toString()}% LOC`);*/
                 
-                if (localStorage.getItem("robot") == "Tutti i robot") {
+                if (localStorage.getItem("robot") == "Tutti i Robot") {
                   if(response.win == "true") {
                     alert("Eccellente: Hai battuto tutti i Robot!");
                   } 
@@ -842,6 +839,11 @@ public class TestClasse {
                   }
                 } 
                 else {
+                  perc_robot = response.robotScore.toString();
+                
+                
+                  consoleArea.setValue(response.outCompile);
+                  highlightCodeCoverage($.parseXML(response.coverage));
                   alert(response.win == true ? "Hai vinto!" : "Hai perso!");
                 }                
                 if(response.win == true){
@@ -954,7 +956,6 @@ public class TestClasse {
                       consoleArea2.setValue(`Esito Risultati (percentuale di linee coperte)
 Il tuo punteggio EvoSuite: ${terzoElemento}% LOC
 Il tuo punteggio Jacoco: ${risp.score.toString()}% LOC
-Il punteggio del robot: ${risp.robotScore.toString()}% LOC
 Informazioni aggiuntive di copertura:
 Il tuo punteggio EvoSuite: ${terzoElemento1}% Branch
 Il tuo punteggio EvoSuite: ${terzoElemento2}% Exception
@@ -963,6 +964,7 @@ Il tuo punteggio EvoSuite: ${terzoElemento4}% Output
 Il tuo punteggio EvoSuite: ${terzoElemento5}% Method
 Il tuo punteggio EvoSuite: ${terzoElemento6}% MethodNoException
 Il tuo punteggio EvoSuite: ${terzoElemento7}% CBranch`);
+//Il punteggio del robot: ${risp.robotScore.toString()}% LOC
                     }
                   }
 

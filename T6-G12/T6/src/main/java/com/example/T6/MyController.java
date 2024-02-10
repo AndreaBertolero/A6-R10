@@ -151,14 +151,18 @@ public class MyController {
             // RISULTATI UTENTE VERSO TASK 7
             ScorePair userScore = runnerHelper.getUserScore(request);
             if(userScore.getOutCompile().equals("error")) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            
+
+            System.out.println("Punteggiodell'utente: " + userScore);
+
             URIBuilder builder = new URIBuilder("http://t4-g18-app-1:3000/robots");
             builder.setParameter("testClassId", request.getParameter("testClassId"));
             
             JSONObject result = new JSONObject();
 
+            System.out.println("Robot: " + request.getParameter("type"));
+
             // RISULTATI ROBOT VERSO TASK4
-            if(request.getParameter("type").equals("Tutti i robot")) {
+            if(request.getParameter("type").equals("Tutti i Robot")) {
                 result = runnerHelper.bossRushRunner(builder, userScore, request);
             }
             else {
