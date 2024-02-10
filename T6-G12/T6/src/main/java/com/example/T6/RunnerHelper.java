@@ -32,12 +32,6 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class RunnerHelper {
     
-    private ClassUnderTestData currentClassUnderTestData;
-
-    public RunnerHelper(ClassUnderTestData currentClassUnderTestData) {
-        this.currentClassUnderTestData = currentClassUnderTestData;
-    }
-    
     public class ScorePair {
         private String outCompile;
         private int coverage;
@@ -56,8 +50,14 @@ public class RunnerHelper {
         }
     }
 
+    private ClassUnderTestData currentClassUnderTestData;
+
     public final HttpClient httpClient = HttpClientBuilder.create().build();
-    
+
+    public RunnerHelper(ClassUnderTestData currentClassUnderTestData) {
+        this.currentClassUnderTestData = currentClassUnderTestData;
+    }
+
     public ScorePair getUserScore(HttpServletRequest request) throws ClientProtocolException, IOException {
         HttpPost httpPost = new HttpPost("http://remoteccc-app-1:1234/compile-and-codecoverage");
     
@@ -76,8 +76,7 @@ public class RunnerHelper {
     
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode > 299) {
-            System.out.println("Errore in compilecodecoverage");
-            return new ScorePair("error", -1);
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore di compile-coverage)");
         }
     
         // entity contiene il corpo della risposta contenente la coverage del giocatore
@@ -139,19 +138,13 @@ public class RunnerHelper {
     }
 
     public JSONObject bossRushRunner(URIBuilder builder, ScorePair userScore, HttpServletRequest request) throws ClientProtocolException, IOException, ParseException, URISyntaxException {
-        System.out.println("inizio randoopScores");
         List<Integer> randoopScores = roboScoresBossRushGet(builder, "randoop");
-        System.out.println("fine randoopScores");
-        System.out.println("inizio evosuiteScores");
         List<Integer> evosuiteScores = roboScoresBossRushGet(builder, "evosuite");
-        System.out.println("fine evosuiteScores");
     
-        System.out.println("inizio builder");
         JSONObject result = responseBuilderBossRush(randoopScores, evosuiteScores, userScore);
-        System.out.println("fine builder");
-        System.out.println("inizio salvataggio");
+
         saving(result, request, "bossRush");
-        System.out.println("fine salvataggio");
+
         return result;
     }
 
@@ -162,7 +155,6 @@ public class RunnerHelper {
         List<Integer> robot = new ArrayList<>();
         HttpResponse response; 
         for(int i = 1; i < 11; i++) {
-            System.out.println("Calcolo Uri " + i + " di tipo " + type);
             URIBuilder subHelper = helper;
             subHelper.setParameter("difficulty", String.valueOf(i));
     
@@ -187,6 +179,7 @@ public class RunnerHelper {
             Integer roboScore = Integer.parseInt(score);
             robot.add(roboScore);
         }
+
         return robot;
     }
 
@@ -223,7 +216,6 @@ public class RunnerHelper {
         if(numberOfBeaten == randoopScores.size() + evosuiteScores.size())
             globalWin = true;
     
-        System.out.println("Valore della coverage del giocatore: " + userScore.getCoverage());
         result.put("outCompile", userScore.getOutCompile());
         result.put("score", String.valueOf(userScore.getCoverage()));
         result.put("win", String.valueOf(globalWin));
@@ -245,7 +237,6 @@ public class RunnerHelper {
         String difficolta = currentClassUnderTestData.difficolta;
         //-----------------Aggiunta A9---------------
 
-        System.out.println("inizio salvataggio turno");
         HttpPut httpPut = new HttpPut("http://t4-g18-app-1:3000/turns/" + String.valueOf(request.getParameter("turnId")));
     
         JSONObject obj = new JSONObject();
@@ -253,7 +244,6 @@ public class RunnerHelper {
         if(mode.equals("bossRush")) {
             int numberOfBeaten = Integer.parseInt(result.getString("numberOfBeaten"));
             int numberOfUnbeaten = Integer.parseInt(result.getString("numberOfUnbeaten"));
-            System.out.println("prova salvataggio turno " + result.getString("score"));
             String s = result.getString("score") + "(" + String.valueOf(numberOfBeaten) + "/" + String.valueOf(numberOfBeaten + numberOfUnbeaten) + ")";
             System.out.println(s);
             obj.put("scores", s);
@@ -262,7 +252,6 @@ public class RunnerHelper {
             obj.put("scores", result.getString("score"));
 
         String win = result.getString("win");
-        System.out.println(win);
         obj.put("isWinner", Boolean.parseBoolean(win));
     
         String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
@@ -274,8 +263,6 @@ public class RunnerHelper {
         StringEntity jsonEntity = new StringEntity(obj.toString(), ContentType.APPLICATION_JSON);
     
         httpPut.setEntity(jsonEntity);
-    
-        System.out.println("inizio esecuzione put turno");
         
         HttpResponse response = httpClient.execute(httpPut);
         httpPut.releaseConnection();
@@ -284,13 +271,10 @@ public class RunnerHelper {
 
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode > 299) {
-            System.out.println(statusCode);
             throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore in put turn");
         }
 
-        System.out.println("fine salvataggio turno");
         // chiusura round
-        System.out.println("inizio salvataggio round");
         httpPut = new HttpPut("http://t4-g18-app-1:3000/rounds/" + String.valueOf(request.getParameter("roundId")));
     
         obj = new JSONObject();
@@ -308,9 +292,8 @@ public class RunnerHelper {
         if (statusCode > 299) {
             throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore in put round");
         }
-        System.out.println("fine salvataggio round");
+
         // chiusura gioco
-        System.out.println("inizio salvataggio gioco");
         httpPut = new HttpPut("http://t4-g18-app-1:3000/games/" + String.valueOf(request.getParameter("gameId")));
     
         obj = new JSONObject();
@@ -327,8 +310,6 @@ public class RunnerHelper {
         if (statusCode > 299) {
             throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore in put game");
         }
-
-        System.out.println("fine salvataggio gioco");
     
     }
     

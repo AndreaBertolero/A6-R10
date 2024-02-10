@@ -150,16 +150,11 @@ public class MyController {
             // Esegui la richiesta HTTP al servizio di destinazione
             // RISULTATI UTENTE VERSO TASK 7
             ScorePair userScore = runnerHelper.getUserScore(request);
-            if(userScore.getOutCompile().equals("error")) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
-            System.out.println("Punteggiodell'utente: " + userScore);
 
             URIBuilder builder = new URIBuilder("http://t4-g18-app-1:3000/robots");
             builder.setParameter("testClassId", request.getParameter("testClassId"));
             
             JSONObject result = new JSONObject();
-
-            System.out.println("Robot: " + request.getParameter("type"));
 
             // RISULTATI ROBOT VERSO TASK4
             if(request.getParameter("type").equals("Tutti i Robot")) {
@@ -172,13 +167,8 @@ public class MyController {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
     
-            System.out.println("FINE RUNNER");
             return new ResponseEntity<>(result.toString(), headers, HttpStatus.OK);
-
-            
-
-            
-            
+        
         } catch (Exception e) {
             // Gestisci eventuali errori e restituisci un messaggio di errore al client
             System.err.println(e);
