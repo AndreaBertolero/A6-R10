@@ -54,7 +54,7 @@ public class MyController {
     }
 
     private ClassUnderTestData currentClassUnderTestData;
-
+ 
     @Autowired
     public MyController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -142,8 +142,7 @@ public class MyController {
         return Files.readAllBytes(path);
     }
 
-    @PostMapping("/run") // NON ESISTE NESSUN INTERFACCIA VERSO I COMPILATORI DEI ROBOT EVOSUITE E
-                         // RANDOOP
+    @PostMapping("/run") 
     public ResponseEntity<String> runner(HttpServletRequest request) {
         try {
             RunnerHelper runnerHelper = new RunnerHelper(currentClassUnderTestData);

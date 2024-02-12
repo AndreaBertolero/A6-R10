@@ -40,11 +40,9 @@ public class RunnerHelper {
             this.outCompile = outCompile;
             this.coverage = coverage;
         }
-    
         public String getOutCompile() {
             return outCompile;
         }
-    
         public int getCoverage() {
             return coverage;
         }
@@ -94,7 +92,8 @@ public class RunnerHelper {
         return new ScorePair(outCompile, ParseUtil.LineCoverage(coverage));
     }
 
-    public JSONObject normalRunner(URIBuilder builder, ScorePair userScore, HttpServletRequest request) throws ClientProtocolException, IOException, URISyntaxException {
+    public JSONObject normalRunner(URIBuilder builder, ScorePair userScore, HttpServletRequest request) 
+        throws ClientProtocolException, IOException, URISyntaxException {
         int roboScore = roboScoreNormalGet(builder, request);
     
         JSONObject result = responseBuilderNormal(roboScore, userScore);
@@ -102,7 +101,8 @@ public class RunnerHelper {
         return result;
     }
 
-    public int roboScoreNormalGet(URIBuilder builder, HttpServletRequest request) throws URISyntaxException, ClientProtocolException, IOException {
+    public int roboScoreNormalGet(URIBuilder builder, HttpServletRequest request) throws 
+        URISyntaxException, ClientProtocolException, IOException {
         builder.setParameter("type", request.getParameter("type"));
         builder.setParameter("difficulty", request.getParameter("difficulty"));
     
@@ -112,7 +112,8 @@ public class RunnerHelper {
         // Verifica lo stato della risposta
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode > 299) {
-            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore in robots" + " " + request.getParameter("robot"));
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore in robots" + 
+                " " + request.getParameter("robot"));
         }
     
         // Leggi il contenuto dalla risposta
@@ -137,7 +138,8 @@ public class RunnerHelper {
         return result;
     }
 
-    public JSONObject bossRushRunner(URIBuilder builder, ScorePair userScore, HttpServletRequest request) throws ClientProtocolException, IOException, ParseException, URISyntaxException {
+    public JSONObject bossRushRunner(URIBuilder builder, ScorePair userScore, HttpServletRequest request) throws 
+        ClientProtocolException, IOException, ParseException, URISyntaxException {
         List<Integer> randoopScores = roboScoresBossRushGet(builder, "randoop");
         List<Integer> evosuiteScores = roboScoresBossRushGet(builder, "evosuite");
     
@@ -148,7 +150,8 @@ public class RunnerHelper {
         return result;
     }
 
-    public List<Integer> roboScoresBossRushGet(URIBuilder builder, String type) throws URISyntaxException, ParseException, IOException {
+    public List<Integer> roboScoresBossRushGet(URIBuilder builder, String type) throws 
+        URISyntaxException, ParseException, IOException {
         URIBuilder helper = builder;
         helper.setParameter("type", type);
 
@@ -245,7 +248,6 @@ public class RunnerHelper {
             int numberOfBeaten = Integer.parseInt(result.getString("numberOfBeaten"));
             int numberOfUnbeaten = Integer.parseInt(result.getString("numberOfUnbeaten"));
             String s = result.getString("score") + "(" + String.valueOf(numberOfBeaten) + "/" + String.valueOf(numberOfBeaten + numberOfUnbeaten) + ")";
-            System.out.println(s);
             obj.put("scores", s);
         }
         else 
@@ -266,8 +268,6 @@ public class RunnerHelper {
         
         HttpResponse response = httpClient.execute(httpPut);
         httpPut.releaseConnection();
-        
-        System.out.println("fine esecuzione put turno");
 
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode > 299) {
