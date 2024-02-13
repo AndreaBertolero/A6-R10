@@ -34,17 +34,22 @@ public class RunnerHelper {
     
     public class ScorePair {
         private String outCompile;
-        private int coverage;
+        private String xmlString;
+        private int score;
     
-        public ScorePair(String outCompile, int coverage) {
+        public ScorePair(String outCompile, String xmlString, int score) {
             this.outCompile = outCompile;
-            this.coverage = coverage;
+            this.xmlString = xmlString;
+            this.score = score;
         }
         public String getOutCompile() {
             return outCompile;
         }
-        public int getCoverage() {
-            return coverage;
+        public String getXmlString() {
+            return xmlString;
+        }
+        public int getScore() {
+            return score;
         }
     }
 
@@ -85,11 +90,11 @@ public class RunnerHelper {
         String responseBody = EntityUtils.toString(entity);
         JSONObject responseObj = new JSONObject(responseBody);
     
-        String coverage = responseObj.getString("coverage");
+        String xmlString = responseObj.getString("coverage");
         String outCompile = responseObj.getString("outCompile");
         // PRESA DELLO SCORE UTENTE
         // percentuale di coverage dell'utente trasformata in intero
-        return new ScorePair(outCompile, ParseUtil.LineCoverage(coverage));
+        return new ScorePair(outCompile, xmlString, ParseUtil.LineCoverage(xmlString));
     }
 
     public JSONObject normalRunner(URIBuilder builder, ScorePair userScore, HttpServletRequest request) 
@@ -131,15 +136,16 @@ public class RunnerHelper {
         JSONObject result = new JSONObject();
         boolean winnormal = false;
 
-        if(userScore.getCoverage() >= roboScore)
+        if(userScore.getScore() >= roboScore)
             winnormal = true;
         else
             winnormal = false;
     
         result.put("outCompile", userScore.getOutCompile());
+        result.put("coverage", userScore.getXmlString());
         result.put("win", String.valueOf(winnormal));
         result.put("robotScore", roboScore);
-        result.put("score", String.valueOf(userScore.getCoverage()));
+        result.put("score", String.valueOf(userScore.getScore()));
     
         return result;
     }
@@ -201,7 +207,7 @@ public class RunnerHelper {
         int numberOfBeaten = 0;
         int numberOfUnbeaten = 0;
         for(i = 0; i < randoopScores.size(); i++) {
-            if(randoopScores.get(i) <= userScore.getCoverage()) { 
+            if(randoopScores.get(i) <= userScore.getScore()) { 
                 result.put("beaten"+String.valueOf(numberOfBeaten+1), String.valueOf(i+1) + "&" + String.valueOf(randoopScores.get(i)));
                 numberOfBeaten++;
             }
@@ -212,7 +218,7 @@ public class RunnerHelper {
         }
     
         for(i = 0; i < evosuiteScores.size(); i++) {
-            if(evosuiteScores.get(i) <= userScore.getCoverage()) { 
+            if(evosuiteScores.get(i) <= userScore.getScore()) { 
                 result.put("beaten"+String.valueOf(numberOfBeaten+1), String.valueOf(i+1+randoopScores.size()) + "&" + String.valueOf(evosuiteScores.get(i)));
                 numberOfBeaten++;
             }
@@ -226,7 +232,7 @@ public class RunnerHelper {
             globalWin = true;
     
         result.put("outCompile", userScore.getOutCompile());
-        result.put("score", String.valueOf(userScore.getCoverage()));
+        result.put("score", String.valueOf(userScore.getScore()));
         result.put("win", String.valueOf(globalWin));
         result.put("numberOfBeaten", String.valueOf(numberOfBeaten));
         result.put("numberOfUnbeaten", String.valueOf(numberOfUnbeaten));
