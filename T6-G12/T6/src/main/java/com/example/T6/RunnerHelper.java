@@ -129,9 +129,15 @@ public class RunnerHelper {
 
     public JSONObject responseBuilderNormal(int roboScore, ScorePair userScore) {
         JSONObject result = new JSONObject();
+        boolean winnormal = false;
+
+        if(userScore.getCoverage() >= roboScore)
+            winnormal = true;
+        else
+            winnormal = false;
     
         result.put("outCompile", userScore.getOutCompile());
-        result.put("win", userScore.getCoverage() >= roboScore);
+        result.put("win", String.valueOf(winnormal));
         result.put("robotScore", roboScore);
         result.put("score", String.valueOf(userScore.getCoverage()));
     
@@ -139,7 +145,7 @@ public class RunnerHelper {
     }
 
     public JSONObject bossRushRunner(URIBuilder builder, ScorePair userScore, HttpServletRequest request) throws 
-        ClientProtocolException, IOException, ParseException, URISyntaxException {
+            ClientProtocolException, IOException, ParseException, URISyntaxException {
         List<Integer> randoopScores = roboScoresBossRushGet(builder, "randoop");
         List<Integer> evosuiteScores = roboScoresBossRushGet(builder, "evosuite");
     
@@ -151,7 +157,7 @@ public class RunnerHelper {
     }
 
     public List<Integer> roboScoresBossRushGet(URIBuilder builder, String type) throws 
-        URISyntaxException, ParseException, IOException {
+            URISyntaxException, ParseException, IOException {
         URIBuilder helper = builder;
         helper.setParameter("type", type);
 
