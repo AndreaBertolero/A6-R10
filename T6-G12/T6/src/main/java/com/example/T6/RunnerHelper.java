@@ -232,6 +232,7 @@ public class RunnerHelper {
             globalWin = true;
     
         result.put("outCompile", userScore.getOutCompile());
+        result.put("coverage", userScore.getXmlString());
         result.put("score", String.valueOf(userScore.getScore()));
         result.put("win", String.valueOf(globalWin));
         result.put("numberOfBeaten", String.valueOf(numberOfBeaten));
